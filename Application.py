@@ -20,4 +20,4 @@ for i in range(7):
 
 root.resizable(False, False)
 root.title("Connect 4 ML")
-root.mainloop()
+root.mainloop() 
