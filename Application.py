@@ -39,7 +39,10 @@ class Game:
                 self.draw_chip(column*100, (index+1)*100, team)
                 self.turn = self.turn ^ 1
                 if self.process():
-                    sys.exit(99)
+                    self.canvas.create_rectangle(200,200,500,500,fill="white")
+                    self.canvas.create_text(350,350,text="WINNER",width=200,
+                                            font=font.Font(family='Helvetica', size=36, weight='bold'),
+                                            fill="black")
                 break
             else:
                 break
@@ -52,12 +55,11 @@ class Game:
         self.canvas.create_oval(x,y,x+100,y+100,fill=color)
 
     def process(self):
-        print("-----------------===================--------------------------")
+        #print("-----------------===================-------------------")
         for y in range(6):
             for x in range(7):
                 for direction in range(4):
                     if self.board[y][x] != None and self.check_four(0, self.board[y][x], x, y, direction):
-                        print(direction)
                         return True
         return False
 
@@ -78,7 +80,7 @@ class Game:
                 elif n==3:
                     return True
                 else:
-                    print("horizontal", n, team, "x:", x, "y:", y)
+                    #print("horizontal", n, team, "x:", x, "y:", y)
                     return self.check_four(n+1, team, x + 1, y, direction)
             elif direction == 1:
                 if x == 6 or y == 5:
