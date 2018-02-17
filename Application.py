@@ -10,6 +10,7 @@ class Game:
         self.height = 6
         self.team_zero = 0
         self.team_one = 1
+        self.turn = 0
 
         self.canvas = tk.Canvas(relief=tk.FLAT, background="#D2D2D2", width=700, height=800)
         self.canvas.pack(side=tk.BOTTOM, anchor=tk.NW, padx=10)
@@ -44,6 +45,7 @@ class Game:
                 self.canvas.create_oval(x+7, y+7, x + 100-7, y + 100-7, fill="white")
 
     def add(self, column, team):
+
         if not self.winner:
             index = 0
             while True:
