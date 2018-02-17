@@ -8,59 +8,84 @@ class Game:
     def __init__(self):
         self.width = 7
         self.height = 6
-        self.board = [[None for _ in range(self.width)] for _ in range(self.height)]
         self.team_zero = 0
         self.team_one = 1
-        self.turn = 0
-        self.canvas = tk.Canvas(relief=tk.FLAT, background="#D2D2D2", width=700, height=700)
 
-    def draw_grid(self):
-        self.canvas.pack(side=tk.TOP, anchor=tk.NW, padx=10, pady=10)
+        self.canvas = tk.Canvas(relief=tk.FLAT, background="#D2D2D2", width=700, height=800)
+        self.canvas.pack(side=tk.BOTTOM, anchor=tk.NW, padx=10)
 
         buttons = []
         button_windows = []
-
         for i in range(7):
-            buttons.append(Button(root, game, i))
+            buttons.append(Button(root, self, i))
             button_windows.append(self.canvas.create_window(i * 100, 0, anchor=tk.NW, window=buttons[-1]))
+
+        self.menu = tk.Canvas(relief=tk.FLAT, background="#D2D2D2", width=700, height=25)
+        self.menu.pack(side=tk.TOP, anchor=tk.NW, padx=10)
+        self.quit = tk.Button(root, text="Quit", command=root.destroy, height=1, width=5,
+                              font=font.Font(family='Helvetica', size=8))
+        self.restart = tk.Button(root, text="Restart", command=self.draw_grid, height=1, width=5,
+                                 font=font.Font(family='Helvetica', size=8))
+        self.menu.create_window(700,0,anchor=tk.NE,window=self.quit)
+        self.menu.create_window(350, 0, anchor=tk.N, window=self.restart)
+
+    def draw_grid(self):
+        try:
+            self.kill_winner()
+        except:
+            pass
+        self.board = [[None for _ in range(self.width)] for _ in range(self.height)]
+        self.winner = False
+        self.turn = 0
+
         for y in range(100, 7 * 100, 100):
             for x in range(0, 7 * 100, 100):
                 self.canvas.create_rectangle(x, y, x + 100, y + 100, fill="blue")
-                self.canvas.create_oval(x, y, x + 100, y + 100, fill="white")
+                self.canvas.create_oval(x+7, y+7, x + 100-7, y + 100-7, fill="white")
 
     def add(self, column, team):
-        index = 0
-        while True:
-            if index<6 and self.board[index][column] == None:
-                index += 1
-            elif index != 0:
-                index -= 1
-                self.board[index][column] = team
-                self.draw_chip(column*100, (index+1)*100, team)
-                self.turn = self.turn ^ 1
-                if self.process():
-                    self.canvas.create_rectangle(200,200,500,500,fill="white")
-                    self.canvas.create_text(350,350,text="WINNER",width=200,
-                                            font=font.Font(family='Helvetica', size=36, weight='bold'),
-                                            fill="black")
-                break
-            else:
-                break
+        if not self.winner:
+            index = 0
+            while True:
+                if index<6 and self.board[index][column] == None:
+                    index += 1
+                elif index != 0:
+                    index -= 1
+                    self.board[index][column] = team
+                    self.draw_chip(column*100, (index+1)*100, team)
+                    self.turn = self.turn ^ 1
+                    self.winner = self.process()
+                    if self.winner:
+                        self.win_rect = self.canvas.create_rectangle(200, 200, 500, 500, fill=self.winner)
+                        self.win_dialogue = self.canvas.create_text(350,350,text="WINNER",width=200,
+                                                font=font.Font(family='Helvetica', size=36, weight='bold'),
+                                                fill="black")
+                        self.close = self.canvas.create_window(500,200, anchor = tk.NE, window=tk.Button(root,
+                                                    text="X", command=self.kill_winner,
+                                                    font=font.Font(family='Helvetica', size=8),
+                                                    width=2))
+                    break
+                else:
+                    break
+
+    def kill_winner(self):
+        self.canvas.delete(self.win_dialogue)
+        self.canvas.delete(self.close)
+        self.canvas.delete(self.win_rect)
 
     def draw_chip(self, x, y, team):
         if team == 0:
             color = "red"
         else:
             color = "yellow"
-        self.canvas.create_oval(x,y,x+100,y+100,fill=color)
+        self.canvas.create_oval(x+7,y+7,x+100-7,y+100-7,fill=color)
 
     def process(self):
-        #print("-----------------===================-------------------")
         for y in range(6):
             for x in range(7):
                 for direction in range(4):
                     if self.board[y][x] != None and self.check_four(0, self.board[y][x], x, y, direction):
-                        return True
+                        return "yellow" if self.board[y][x] else "red"
         return False
 
     def check_four(self, n, team, x, y, direction):
@@ -70,7 +95,7 @@ class Game:
         direction:
             0: horizontal to left
             1: diagonal left
-            2: down
+            2: vertical
             3: diagonal right
         """
         if self.board[y][x] == team:
@@ -80,7 +105,6 @@ class Game:
                 elif n==3:
                     return True
                 else:
-                    #print("horizontal", n, team, "x:", x, "y:", y)
                     return self.check_four(n+1, team, x + 1, y, direction)
             elif direction == 1:
                 if x == 6 or y == 5:
@@ -90,15 +114,13 @@ class Game:
                 elif n==3:
                     return True
                 else:
-                    #print("diagonal ", n, team, "x:", x, "y:", y, direction)
                     return self.check_four(n + 1, team, x + 1, y + 1, direction)
             elif direction == 2:
-                if y == 5:
-                    return False
-                elif n==3:
+                if n == 3:
                     return True
+                elif y == 5:
+                    return False
                 else:
-                    #print("vertical ", n, team, "x:", x, "y:", y, direction)
                     return self.check_four(n + 1, team, x, y + 1, direction)
             else:
                 if x == 0 or y == 5:
@@ -111,7 +133,6 @@ class Game:
                     #print("diagonal ", n, team, "x:", x, "y:", y, direction)
                     return self.check_four(n + 1, team, x - 1, y + 1, direction)
         return False
-
 
 if __name__ == "__main__":
     game = Game()
