@@ -102,30 +102,22 @@ class Game:
             0: horizontal to left
             1: diagonal going left down
             2: vertical
-            3: diagonal goig right down
+            3: diagonal going right down
         """
         if self.board[y][x] == team:
             if n == 3:
                 return True
             if direction == 0:
-                if x == 6:
-                    return False
-                else:
+                if x != 6:
                     return self.check_four(n+1, team, x + 1, y, direction)
             elif direction == 1:
-                if x == 6 or y == 5:
-                    return False
-                else:
+                if x != 6 and y != 5:
                     return self.check_four(n + 1, team, x + 1, y + 1, direction)
             elif direction == 2:
-                if y == 5:
-                    return False
-                else:
+                if y != 5:
                     return self.check_four(n + 1, team, x, y + 1, direction)
             else:
-                if x == 0 or y == 5:
-                    return False
-                else:
+                if x != 0 and y != 5:
                     return self.check_four(n + 1, team, x - 1, y + 1, direction)
         return False
 
