@@ -12,7 +12,7 @@ class Game:
         self.team_one = 1
         self.turn = 0
 
-        self.canvas = tk.Canvas(relief=tk.FLAT, background="#D2D2D2", width=700, height=800)
+        self.canvas = tk.Canvas(background="white", width=700, height=800)
         self.canvas.pack(side=tk.BOTTOM, anchor=tk.NW, padx=10)
 
         buttons = []
@@ -21,14 +21,16 @@ class Game:
             buttons.append(Button(root, self, i))
             button_windows.append(self.canvas.create_window(i * 100, 0, anchor=tk.NW, window=buttons[-1]))
 
-        self.menu = tk.Canvas(relief=tk.FLAT, background="#D2D2D2", width=700, height=25)
+        self.menu = tk.Canvas(relief=tk.FLAT, background="white", width=700, height=25)
         self.menu.pack(side=tk.TOP, anchor=tk.NW, padx=10)
         self.quit = tk.Button(root, text="Quit", command=root.destroy, height=1, width=5,
-                              font=font.Font(family='Helvetica', size=8))
+                              font=font.Font(family='Helvetica', size=10), bg="yellow")
         self.restart = tk.Button(root, text="Restart", command=self.draw_grid, height=1, width=5,
-                                 font=font.Font(family='Helvetica', size=8))
-        self.menu.create_window(700,0,anchor=tk.NE,window=self.quit)
-        self.menu.create_window(350, 0, anchor=tk.N, window=self.restart)
+                                 font=font.Font(family='Helvetica', size=10), bg="red")
+        self.title = tk.Label(root, text="Connect 4", bg="white", font=font.Font(family='Helvetica', size=12))
+        self.menu.create_window(700,2,anchor=tk.NE,window=self.quit)
+        self.menu.create_window(0, 2, anchor=tk.NW, window=self.restart)
+        self.menu.create_window(350, 5, anchor=tk.N, window=self.title)
 
     def draw_grid(self):
         try:
@@ -44,8 +46,8 @@ class Game:
                 self.canvas.create_rectangle(x, y, x + 100, y + 100, fill="blue")
                 self.canvas.create_oval(x+7, y+7, x + 100-7, y + 100-7, fill="white")
 
-    def add(self, column, team):
-
+    def add(self, column):
+        team = self.turn
         if not self.winner:
             index = 0
             while True:
@@ -94,45 +96,36 @@ class Game:
         """
         n:
             Number of chips of same color in a row so far; used for recursion
+        team:
+            0 or 1, representing team algorithm is checking for.
         direction:
             0: horizontal to left
-            1: diagonal left
+            1: diagonal going left down
             2: vertical
-            3: diagonal right
+            3: diagonal goig right down
         """
         if self.board[y][x] == team:
+            if n == 3:
+                return True
             if direction == 0:
                 if x == 6:
                     return False
-                elif n==3:
-                    return True
                 else:
                     return self.check_four(n+1, team, x + 1, y, direction)
             elif direction == 1:
                 if x == 6 or y == 5:
-                    if n==3 and y==5:
-                        return True
                     return False
-                elif n==3:
-                    return True
                 else:
                     return self.check_four(n + 1, team, x + 1, y + 1, direction)
             elif direction == 2:
-                if n == 3:
-                    return True
-                elif y == 5:
+                if y == 5:
                     return False
                 else:
                     return self.check_four(n + 1, team, x, y + 1, direction)
             else:
                 if x == 0 or y == 5:
-                    if n == 3 and y == 5:
-                        return True
                     return False
-                elif n == 3:
-                    return True
                 else:
-                    #print("diagonal ", n, team, "x:", x, "y:", y, direction)
                     return self.check_four(n + 1, team, x - 1, y + 1, direction)
         return False
 
