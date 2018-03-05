@@ -26,11 +26,11 @@ public class Connect {
 	 * @return Team that won
 	 */
 	public static int process() {
-		for (int y = 0; y < 6; y++) {
-			for (int x = 0; x < 7; x++) {
-				for (int direction = 0; direction < 4; direction ++) {
-					if (board[y][x] != BLANK && check(0, board[y][x], x, y, direction)) {
-						return board[y][x] == YELLOW ? YELLOW : RED;
+	    for (int y = 0; y < 6; y++) {
+	        for (int x = 0; x < 7; x++) {
+	            for (int direction = 0; direction < 4; direction ++) {
+		            if (board[y][x] != BLANK && check(0, board[y][x], x, y, direction)) {
+	                    return board[y][x] == YELLOW ? YELLOW : RED;
 					}
 				}
 			}
