@@ -88,11 +88,11 @@ class Game:
         for y in range(6):
             for x in range(7):
                 for direction in range(4):
-                    if self.board[y][x] != None and self.check_four(0, self.board[y][x], x, y, direction):
+                    if self.board[y][x] != None and self.check_four(0, self.board[y][x], x, y, direction, x, y):
                         return "yellow" if self.board[y][x] else "red"
         return False
 
-    def check_four(self, n, team, x, y, direction):
+    def check_four(self, n, team, x, y, direction, firstx, firsty):
         """
         n:
             Number of chips of same color in a row so far; used for recursion
@@ -106,19 +106,21 @@ class Game:
         """
         if self.board[y][x] == team:
             if n == 3:
+                self.canvas.create_line(firstx*100+50, firsty*100+150, x*100+50, y*100+150, width=10)
+                print(firstx*100+50, firsty*100+150, x*100+50, y*100+150)
                 return True
             if direction == 0:
                 if x != 6:
-                    return self.check_four(n+1, team, x + 1, y, direction)
+                    return self.check_four(n+1, team, x + 1, y, direction, firstx, firsty)
             elif direction == 1:
                 if x != 6 and y != 5:
-                    return self.check_four(n + 1, team, x + 1, y + 1, direction)
+                    return self.check_four(n + 1, team, x + 1, y + 1, direction, firstx, firsty)
             elif direction == 2:
                 if y != 5:
-                    return self.check_four(n + 1, team, x, y + 1, direction)
+                    return self.check_four(n + 1, team, x, y + 1, direction, firstx, firsty)
             else:
                 if x != 0 and y != 5:
-                    return self.check_four(n + 1, team, x - 1, y + 1, direction)
+                    return self.check_four(n + 1, team, x - 1, y + 1, direction, firstx, firsty)
         return False
 
 if __name__ == "__main__":
